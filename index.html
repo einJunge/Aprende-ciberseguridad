@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cyber Security Career Lab V10.1 OMEGA</title>
+<style>
+:root{
+--bg:#07111f;--panel:#0e1a2d;--card:#13253d;--blue:#18b7ff;--cyan:#00eaff;
+--green:#00d26a;--yellow:#ffc107;--red:#ff3b4d;--text:#eef7ff;--muted:#8fb6d6;
+}
+*{box-sizing:border-box}
+body{
+margin:0;font-family:Segoe UI,Arial,sans-serif;color:var(--text);overflow:hidden;
+background:radial-gradient(circle at top left,#10243f,#07111f 70%);
+}
+button,select,input{font-family:inherit}
+button{
+border:none;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;color:#fff;
+background:linear-gradient(135deg,#173760,#1f5fb1);transition:.2s;
+}
+button:hover{transform:translateY(-2px);box-shadow:0 0 18px #18b7ff55}
+button.active{background:linear-gradient(135deg,#00a56b,#00d26a)}
+select,input{
+padding:8px;border-radius:10px;border:1px solid #294b72;background:#081321;color:#fff;
+}
+#start{
+position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+gap:24px;padding:30px;z-index:50;
+background:radial-gradient(circle at center,#10243f,#07111f 70%);
+}
+.logo{font-size:42px;font-weight:900;text-shadow:0 0 22px var(--cyan);text-align:center}
+.roles{
+display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:18px;width:min(1200px,100%);
+}
+.role{
+padding:24px;border-radius:22px;min-height:220px;cursor:pointer;transition:.25s;
+display:flex;flex-direction:column;justify-content:space-between;
+background:linear-gradient(135deg,#12243d,#0c1830);
+border:1px solid #25548f;box-shadow:0 0 28px #18b7ff22;
+}
+.role:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 0 38px #18b7ff66}
+#app{display:none;height:100vh;grid-template-columns:1fr 360px;grid-template-rows:64px 1fr}
+header{
+grid-column:1/3;display:flex;justify-content:space-between;align-items:center;
+padding:10px 14px;background:#081321;border-bottom:1px solid #17395f;
+}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+#left{display:flex;flex-direction:column;overflow:hidden}
+.toolbar{
+display:flex;gap:8px;flex-wrap:wrap;padding:10px;background:#081321;border-bottom:1px solid #17395f;
+}
+#main{
+position:relative;overflow:auto;
+background:
+linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px),
+#07111f;
+background-size:40px 40px;
+}
+#lab{position:relative;width:2400px;height:1500px;transform-origin:0 0}
+#svg{position:absolute;inset:0;pointer-events:none;z-index:1}
+#nodes{position:absolute;inset:0;z-index:2}
+aside{
+background:#081321;border-left:1px solid #17395f;padding:14px;overflow:auto;
+}
+.card{
+background:#0d1b2e;border:1px solid #1a3e67;padding:12px;border-radius:16px;margin-bottom:12px;
+}
+.small{font-size:13px;color:var(--muted)}
+.logs{
+height:220px;overflow:auto;font-size:12px;background:#02060d;padding:8px;border-radius:12px;
+border:1px solid #183354;
+}
+.log{margin-bottom:6px}
+.node{
+position:absolute;width:122px;height:110px;border-radius:18px;cursor:grab;user-select:none;z-index:5;
+display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+background:linear-gradient(135deg,#17375e,#11213b);
+border:1px solid #2c6cb6;box-shadow:0 0 20px #18b7ff55,inset 0 0 20px #ffffff10;
+animation:pop .22s ease;
+}
+@keyframes pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+.node .ico{font-size:34px}.node .txt{font-size:12px;font-weight:700;text-align:center;padding:0 4px}
+.safe{box-shadow:0 0 18px #00d26a77}
+.risk{animation:pulse 1s infinite}
+.compromised{animation:blink .7s infinite}
+.down{filter:grayscale(1) brightness(.4);animation:glitch .35s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 12px #ffc10755}50%{box-shadow:0 0 26px #ffc107}}
+@keyframes blink{0%,100%{box-shadow:0 0 12px #ff3b4d}50%{box-shadow:0 0 28px #ff3b4d}}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(1px,-1px)}50%{transform:translate(-1px,1px)}75%{transform:translate(1px,1px)}}
+#challengeBox{
+position:fixed;
+right:20px;
+top:80px;
+z-index:999;
+width:340px;
+max-height:70vh;
+overflow:auto;
+padding:16px;
+background:#081321f2;
+border:1px solid #29548d;
+border-radius:18px;
+backdrop-filter:blur(10px);
+box-shadow:0 0 25px #18b7ff33;
+}
+#mini{
+height:140px;background:#02060d;border-radius:12px;border:1px solid #183354;position:relative;overflow:hidden;
+}
+.dot{position:absolute;width:6px;height:6px;background:#18b7ff;border-radius:50%}
+</style>
+</head>
+<body>
+
+<div id="start">
+<div class="logo">Cyber Security Career Lab V10.1 OMEGA</div>
+<div class="roles">
+<div class="role" onclick="startRole('SOC')"><h2>🛡️ ANALISTA SOC</h2><p>Defiende redes y responde incidentes reales.</p><button>Entrar</button></div>
+<div class="role" onclick="startRole('FORENSE')"><h2>🕵️ FORENSE DIGITAL</h2><p>Investiga ataques y recupera evidencias.</p><button>Entrar</button></div>
+<div class="role" onclick="startRole('PENTESTER')"><h2>⚔️ PENTESTER</h2><p>Explota vulnerabilidades éticamente.</p><button>Entrar</button></div>
+</div>
+</div>
+
+<div id="app">
+<header>
+<nav>
+<button onclick="modeLab()">🧪 Laboratorio</button>
+<button onclick="modeChallenge()">🎯 Retos</button>
+<button onclick="tutorial()">📘 Tutorial</button>
+<button onclick="home()">🏠 Inicio</button>
+</nav>
+<button onclick="toggleFull()">⛶ Pantalla</button>
+</header>
+
+<div id="left">
+<div class="toolbar">
+<select id="dev">
+<option>Router 📡</option><option>Firewall 🔥</option><option>Switch 🔀</option>
+<option>PC 🖥️</option><option>Laptop 💻</option><option>Servidor 🌐</option>
+<option>BaseDatos 🗄️</option><option>NAS 💾</option><option>Cámara 📷</option>
+<option>WiFi 📶</option><option>IoT 📱</option>
+</select>
+<button onclick="addNode()">➕ Agregar</button>
+<button onclick="autoConnect()">🔗 Auto Conectar</button>
+<button id="connectBtn" onclick="toggleConnect()">🧷 Conectar</button>
+<button onclick="testLab()">🧪 Probar</button>
+<button onclick="saveLab()">💾 Guardar</button>
+<button onclick="loadLab()">📂 Cargar</button>
+<button onclick="resetAll()">♻️ Reset</button>
+<input type="range" min="50" max="150" value="100" onchange="zoom(this.value)">
+</div>
+
+<div id="main">
+<div id="lab">
+<svg id="svg"></svg>
+<div id="nodes"></div>
+</div>
+</div>
+</div>
+
+<aside>
+<div class="card">
+<h3 id="roleTxt">Rol</h3>
+<div class="small">Nivel: <span id="lvl">1</span></div>
+<div class="small">Puntos: <span id="pts">0</span></div>
+<div class="small">Título: <span id="rank">Junior</span></div>
+</div>
+
+<div class="card">
+<div>Seguridad: <span id="sec">50</span>%</div>
+<div>Vulnerabilidad: <span id="vul">50</span>%</div>
+<div>Rendimiento: <span id="perf">50</span>%</div>
+<div>Estabilidad: <span id="est">50</span>%</div>
+</div>
+
+<div class="card">
+<h4>🤖 IA Asistente</h4>
+<div id="ai" class="small">Esperando análisis...</div>
+</div>
+
+<div class="card">
+<h4>Logs</h4>
+<div class="logs" id="logs"></div>
+</div>
+
+<div class="card">
+<h4>Mini mapa</h4>
+<div id="mini"></div>
+</div>
+</aside>
+</div>
+
+<script>
+let role="",nodes=[],links=[],nid=0,connectMode=false,firstConnect=null,zoomLevel=1;
+let points=0,level=1,challengeRun=null,challengeIndex=1;
+
+const challenges={
+SOC:["Una empresa recibe phishing masivo. Diseña una red segura.","Servidor expuesto en internet. Protégelo.","Ransomware intenta entrar por WiFi."],
+FORENSE:["Una PC fue comprometida. Conserva evidencia.","Analiza equipo infectado sin destruir logs.","Recupera archivos borrados tras ataque."],
+PENTESTER:["Portal con login débil. Obtén acceso.","Router con contraseña por defecto.","Encuentra falla en red IoT."]
+};
+
+const $=id=>document.getElementById(id);
+
+function startRole(r){role=r;$("start").style.display="none";$("app").style.display="grid";$("roleTxt").textContent=r;resetAll();updateRank();log("Rol iniciado: "+r)}
+function home(){location.reload()}
+function tutorial(){alert("Laboratorio: crea redes y prueba seguridad.\nRetos: supera misiones con tiempo.\nColores: Verde seguro / Amarillo riesgo / Rojo comprometido / Negro caído.");}
+function log(t){let d=document.createElement("div");d.className="log";d.textContent="["+new Date().toLocaleTimeString()+"] "+t;$("logs").prepend(d)}
+
+function resetAll(){
+nodes=[];links=[];nid=0;$("nodes").innerHTML="";$("svg").innerHTML="";$("logs").innerHTML="";
+$("ai").textContent="Laboratorio limpio.";removeChallenge();drawMini();
+}
+
+function addNode(){
+let type=$("dev").value,pos=findSpot();
+let n={id:++nid,type,name:type.split(" ")[0]+"-"+nid,x:pos.x,y:pos.y,state:"safe"};
+nodes.push(n);renderNode(n);drawMini();log("Equipo agregado: "+type);assistant();
+}
+function findSpot(){
+for(let y=40;y<1400;y+=140){for(let x=40;x<2300;x+=150){
+let hit=nodes.some(n=>Math.abs(n.x-x)<130&&Math.abs(n.y-y)<120);if(!hit)return{x,y};
+}}return{x:100,y:100};
+}
+function renderNode(n){
+let el=document.createElement("div");
+el.className="node safe";el.id="n"+n.id;el.style.left=n.x+"px";el.style.top=n.y+"px";
+el.innerHTML="<div class='ico'>"+icon(n.type)+"</div><div class='txt'>"+n.name+"</div>";
+$("nodes").appendChild(el);
+
+let drag=false,ox=0,oy=0;
+el.onmousedown=e=>{drag=true;ox=e.clientX-n.x;oy=e.clientY-n.y};
+document.onmousemove=e=>{
+if(!drag)return;
+n.x=Math.max(0,Math.min(2280,e.clientX+$("main").scrollLeft-ox));
+n.y=Math.max(0,Math.min(1380,e.clientY-110-oy));
+el.style.left=n.x+"px";el.style.top=n.y+"px";drawLinks();drawMini();
+};
+document.onmouseup=()=>drag=false;
+el.onclick=()=>{if(connectMode)connectClick(n.id)};
+el.ondblclick=()=>{let v=prompt("Nuevo nombre:",n.name);if(v){n.name=v;el.querySelector(".txt").textContent=v}};
+el.oncontextmenu=e=>{e.preventDefault();removeNode(n.id)};
+}
+function removeNode(id){
+nodes=nodes.filter(n=>n.id!==id);links=links.filter(l=>l.a!==id&&l.b!==id);
+$("n"+id)?.remove();drawLinks();drawMini();
+}
+function icon(t){
+if(t.includes("Router"))return"📡";if(t.includes("Firewall"))return"🔥";if(t.includes("Switch"))return"🔀";
+if(t.includes("PC"))return"🖥️";if(t.includes("Laptop"))return"💻";if(t.includes("Servidor"))return"🌐";
+if(t.includes("Base"))return"🗄️";if(t.includes("NAS"))return"💾";if(t.includes("Cámara"))return"📷";
+if(t.includes("WiFi"))return"📶";return"📱";
+}
+
+function toggleConnect(){connectMode=!connectMode;firstConnect=null;$("connectBtn").classList.toggle("active",connectMode)}
+function connectClick(id){
+if(firstConnect===null){firstConnect=id;log("Selecciona segundo equipo.");return;}
+if(firstConnect===id){firstConnect=null;return;}
+makeLink(firstConnect,id);firstConnect=null;drawLinks();log("Conexión creada.");
+}
+function makeLink(a,b,color="#00eaff"){
+if(a===b)return;
+if(links.some(l=>(l.a===a&&l.b===b)||(l.a===b&&l.b===a)))return;
+links.push({a,b,color});
+}
+function autoConnect(){
+let sw=nodes.find(n=>n.type.includes("Switch")),rt=nodes.find(n=>n.type.includes("Router")),fw=nodes.find(n=>n.type.includes("Firewall"));
+nodes.forEach(n=>{
+if((n.type.includes("PC")||n.type.includes("Laptop"))&&sw)makeLink(n.id,sw.id);
+if((n.type.includes("Servidor")||n.type.includes("NAS"))&&sw)makeLink(n.id,sw.id);
+if(n.type.includes("WiFi")&&rt)makeLink(n.id,rt.id);
+});
+if(sw&&rt)makeLink(sw.id,rt.id);
+if(rt&&fw)makeLink(rt.id,fw.id);
+drawLinks();log("Auto conexión aplicada.");
+}
+function drawLinks(){
+let svg=$("svg");svg.innerHTML="";svg.setAttribute("width",2400);svg.setAttribute("height",1500);
+links.forEach(l=>{
+let a=nodes.find(n=>n.id===l.a),b=nodes.find(n=>n.id===l.b);if(!a||!b)return;
+let x1=a.x+61,y1=a.y+55,x2=b.x+61,y2=b.y+55;
+let line=document.createElementNS("http://www.w3.org/2000/svg","line");
+line.setAttribute("x1",x1);line.setAttribute("y1",y1);line.setAttribute("x2",x2);line.setAttribute("y2",y2);
+line.setAttribute("stroke",l.color);line.setAttribute("stroke-width","4");line.setAttribute("stroke-linecap","round");
+svg.appendChild(line);
+
+let c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+c.setAttribute("r","4");c.setAttribute("fill","#fff");svg.appendChild(c);
+
+let t=0;setInterval(()=>{t=(t+.03)%1;c.setAttribute("cx",x1+(x2-x1)*t);c.setAttribute("cy",y1+(y2-y1)*t)},100);
+});
+}
+
+function testLab(){
+let sec=30,vul=70;
+if(nodes.some(n=>n.type.includes("Firewall"))){sec+=25;vul-=20}
+if(nodes.some(n=>n.type.includes("Switch")))sec+=10;
+if(nodes.some(n=>n.type.includes("NAS")))sec+=10;
+if(nodes.some(n=>n.type.includes("Servidor")))vul+=10;
+if(links.length>3)sec+=10;
+sec=Math.min(100,sec);vul=Math.max(0,vul);
+$("sec").textContent=sec;$("vul").textContent=vul;
+$("perf").textContent=Math.min(100,40+nodes.length*6);
+$("est").textContent=Math.max(20,100-vul);
+assistant();randomIncident();
+}
+function assistant(){
+if(!nodes.some(n=>n.type.includes("Firewall"))){$("ai").textContent="🤖 No tienes firewall.";return;}
+if(nodes.length>8){$("ai").textContent="🤖 Red compleja, segmenta mejor.";return;}
+$("ai").textContent="🤖 Buena segmentación.";
+}
+function setState(n,s){n.state=s;let el=$("n"+n.id);if(el)el.className="node "+s}
+function randomIncident(){
+if(!nodes.length)return;
+let n=nodes[Math.floor(Math.random()*nodes.length)];
+let states=["risk","compromised","down"];
+setState(n,states[Math.floor(Math.random()*states.length)]);
+}
+
+/* RETOS */
+function modeLab(){removeChallenge();log("Modo laboratorio.");}
+function modeChallenge(){
+removeChallenge();
+let box=document.createElement("div");
+box.id="challengeBox";
+box.innerHTML=`
+<h3>🎯 RETO ${challengeIndex}</h3>
+<div>${getChallengeText()}</div>
+<div class="timer" id="timer">03:00</div>
+<button onclick="startChallenge()">▶️ Comenzar Reto</button>
+`;
+$("main").appendChild(box);
+}
+function getChallengeText(){
+let arr=challenges[role]||["Diseña una red segura."];
+return arr[(challengeIndex-1)%arr.length];
+}
+
+/* TEMPORIZADOR CORREGIDO 3 MINUTOS */
+function startChallenge(){
+
+if(challengeRun) clearInterval(challengeRun);
+
+let total = 180; // 3 minutos
+const timerEl = $("timer");
+
+timerEl.style.color="#ffffff";
+timerEl.style.textShadow="0 0 15px #18b7ff";
+timerEl.textContent="03:00";
+
+challengeRun=setInterval(()=>{
+
+total--;
+
+let min=Math.floor(total/60);
+let sec=total%60;
+
+timerEl.textContent=
+String(min).padStart(2,"0")+":"+
+String(sec).padStart(2,"0");
+
+if(total<=30){
+timerEl.style.color="#ff3b4d";
+timerEl.style.textShadow="0 0 18px red";
+}
+
+if(Math.random()>.55) randomIncident();
+
+if(total<=0){
+clearInterval(challengeRun);
+timerEl.textContent="00:00";
+finishChallenge();
+}
+
+},1000);
+
+log("Reto iniciado (3 minutos).");
+}
+
+function finishChallenge(){
+let sec=parseInt($("sec").textContent);
+if(sec>=70){
+points+=100;
+level=Math.floor(points/300)+1;
+challengeIndex++;
+alert("🏆 RETO SUPERADO\n+100 XP");
+}else{
+alert("❌ RETO FALLIDO");
+}
+$("pts").textContent=points;$("lvl").textContent=level;updateRank();modeChallenge();
+}
+function removeChallenge(){if(challengeRun)clearInterval(challengeRun);$("challengeBox")?.remove();}
+function updateRank(){
+let ranks={
+SOC:["Vigilante Junior","Operador SOC","Analista Senior","Blue Commander","Cyber Guardian Elite"],
+FORENSE:["Auxiliar Forense","Investigador","Analista DFIR","Especialista Forense","Maestro Investigador"],
+PENTESTER:["Novato","Junior Tester","Ethical Hacker","Red Team Pro","Leyenda Ofensiva"]
+};
+let arr=ranks[role]||["Junior"];
+$("rank").textContent=arr[Math.min(arr.length-1,Math.floor((level-1)/2))];
+}
+
+/* SAVE */
+function saveLab(){localStorage.setItem("cyberlabv101",JSON.stringify({nodes,links,nid,points,level}));log("Diseño guardado.");}
+function loadLab(){
+let d=localStorage.getItem("cyberlabv101");if(!d)return;
+resetAll();d=JSON.parse(d);
+nodes=d.nodes;links=d.links;nid=d.nid;points=d.points||0;level=d.level||1;
+$("pts").textContent=points;$("lvl").textContent=level;updateRank();
+nodes.forEach(renderNode);drawLinks();drawMini();log("Diseño cargado.");
+}
+
+function zoom(v){zoomLevel=v/100;$("lab").style.transform="scale("+zoomLevel+")";}
+function toggleFull(){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+function drawMini(){
+$("mini").innerHTML="";
+nodes.forEach(n=>{
+let d=document.createElement("div");
+d.className="dot";
+d.style.left=(n.x/2400*100)+"%";
+d.style.top=(n.y/1500*100)+"%";
+$("mini").appendChild(d);
+});
+}
+</script>
+</body>
+</html>
